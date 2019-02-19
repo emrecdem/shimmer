@@ -142,9 +142,8 @@ for (fi in 1:length(fnames)) {
                             max=Omax$enmo_max)
         agData$peak = 0
         # peaks are defined as:
-        # maximum values in an epoch at least 200% the 99th percentile of that epoch
-        # AND with a value above 2
-        # OR with max acceleration above 10
+        # (maximum values in an epoch at least 200% the 99th percentile of that epoch
+        # AND with a value above 2 m/s2) OR with max acceleration above 10
         peakindex = which(((agData$max-agData$p50) > ((agData$p99-agData$p50)*2) & agData$max > 2) |
                             agData$max > 10)
         
