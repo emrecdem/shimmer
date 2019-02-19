@@ -1,7 +1,20 @@
 # Data exploration Shimmer device - 4 February 2019
 rm(list=ls())
 graphics.off()
+#==============================================
+# Key parameters
+#==============================================
+# specify data location:
+path = "/media/sf_sharedfolder/Emotion"
+datapath = paste0(path,"/accelerometer_data/2018-05-07_13.24.29_Ses9_070518_SD_Session1")
+outputfolder = paste0(path,"/accelerometer_data/myresults")
+sf = 500 # TO DO: extract this directly from file
+epochsize = 1 # epoch size in seconds to which data will be aggregated
 
+do.plot = FALSE
+
+#====================================================
+# call packages and declare functions
 library(signal)
 library(zoo)
 library(data.table)
@@ -40,16 +53,8 @@ addvarEnmo = function(x,varname = "") {
 }
 #-------------------------------------------
 # main code:
-
-# specify data location
-path = "/media/sf_sharedfolder/Emotion"
-datapath = paste0(path,"/accelerometer_data/2018-05-07_13.24.29_Ses9_070518_SD_Session1")
-outputfolder = paste0(path,"/accelerometer_data/myresults")
 fnames = dir(datapath)
 blocksize = 500000
-sf = 500 # TO DO: extract this directly from file
-do.plot = FALSE
-
 for (fi in 1:length(fnames)) {
   timer0 = Sys.time()
   fname = paste0(datapath,"/",fnames[fi])
@@ -103,7 +108,7 @@ for (fi in 1:length(fnames)) {
         enmo = signal::filter(bf,enmo)
         # ignore direction of acceleration, now signal is high pass filtered
         enmo = abs(enmo)
-        epochsize = 1 # epoch size in seconds
+        
         
         Gangles = get_angles(x=D$Accel_WR_X_CAL,y=D$Accel_WR_Y_CAL,z=D$Accel_WR_Z_CAL,sf=sf)
         # downsample
@@ -162,5 +167,6 @@ for (fi in 1:length(fnames)) {
   }
   write.csv(data2store,file = paste0(outputfolder,"/accplot_Accel_file_",id,".csv"),row.names = FALSE)
   timer1 = Sys.time()
-  cat(timer1-timer0)
+  print("Time elapsed:")
+  print(timer1-timer0)
 }
