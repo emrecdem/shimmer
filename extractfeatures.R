@@ -166,6 +166,6 @@ for (fi in 1:length(fnames)) {
   }
   write.csv(data2store,file = paste0(outputfolder,"/accplot_Accel_file_",id,".csv"),row.names = FALSE)
   timer1 = Sys.time()
-  print("Time elapsed:")
+  cat("\nTime elapsed:")
   print(timer1-timer0)
 }
