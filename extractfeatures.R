@@ -114,7 +114,7 @@ for (fi in 1:length(fnames)) {
                             pitch_LN = D$Euler_9DOF_Pitch_LN_CAL, pitch_WR = D$Euler_9DOF_Pitch_WR_CAL,
                             roll_LN = D$Euler_9DOF_Roll_LN_CAL, roll_WR = D$Euler_9DOF_Roll_WR_CAL,
                             yaw_LN = D$Euler_9DOF_Yaw_LN_CAL, yaw_WR = D$Euler_9DOF_Yaw_WR_CAL,
-                            time=D$timestamp,index=FiveSecIndex)
+                            time=D$timestamp,numtime=FiveSecIndex)
         if ("GSR_Skin_Conductance_CAL" %in% varname) {
           do.skinsensors = TRUE  
         } else {
@@ -123,16 +123,16 @@ for (fi in 1:length(fnames)) {
         if (do.skinsensors == TRUE) {
           df_skin = data.frame(GSR_Skin_Conductance = D$GSR_Skin_Conductance_CAL,
                               GSR_Skin_Resistance = D$GSR_Skin_Resistance_CAL,
-                              time=D$timestamp, index=FiveSecIndex)
-          Oskin = aggregate(x = df_skin,by = list(df_skin$index),mean)
+                              time=D$timestamp, numtime=FiveSecIndex)
+          Oskin = aggregate(x = df_skin,by = list(df_skin$numtime),mean)
         }
         
-        O50 = aggregate(x = df_kin,by = list(df_kin$index),p50)
-        O75 = aggregate(x = df_kin,by = list(df_kin$index),p75)
-        O99 = aggregate(x = df_kin,by = list(df_kin$index),p99)
-        Omean = aggregate(x = df_kin,by = list(df_kin$index),mean)
-        Omax = aggregate(x = df_kin,by = list(df_kin$index),max)
-        Ostd = aggregate(x = df_kin,by = list(df_kin$index),sd)
+        O50 = aggregate(x = df_kin,by = list(df_kin$numtime),p50)
+        O75 = aggregate(x = df_kin,by = list(df_kin$numtime),p75)
+        O99 = aggregate(x = df_kin,by = list(df_kin$numtime),p99)
+        Omean = aggregate(x = df_kin,by = list(df_kin$numtime),mean)
+        Omax = aggregate(x = df_kin,by = list(df_kin$numtime),max)
+        Ostd = aggregate(x = df_kin,by = list(df_kin$numtime),sd)
         
         O50 = addvarEnmo(x = O50, varname="enmo_p50")
         O75 = addvarEnmo(x = O75, varname="enmo_p75")
@@ -142,7 +142,7 @@ for (fi in 1:length(fnames)) {
         Ostd = addvarEnmo(x = Ostd, varname="enmo_std")
         
         agData = data.frame(time=O50$time,
-                            index=O50$index,
+                            numtime=O50$numtime,
                             acc_percentile50=O50$enmo_p50,
                             acc_percentile75=O75$enmo_p75,
                             acc_percentile99=O99$enmo_p99,
