@@ -9,7 +9,7 @@ path = "/media/sf_sharedfolder/Emotion"
 datafolder = paste0(path,"/accelerometer_data/datamichel")
 outputfolder = paste0(path,"/accelerometer_data/myresults")
 # epoch size in seconds to which data will be aggregated:
-epochsize = 1 
+epochsize = 0.5
 # whether or not to plot some data on screen (mainly useful for testing purposes)
 do.plot = TRUE # change to FALSE to turn off / change to TRUE to turn on
 
@@ -41,7 +41,7 @@ addvarEnmoLN = function(x,varname = "") {
   x = x[,-which(colnames(x) == "enmo_LN")]
   return(x)
 }
-
+options(digits.secs=12) # to get more precise fractions of seconds
 #====================================================
 # main code:
 fnames = dir(datafolder)
@@ -56,6 +56,7 @@ for (fi in 1:length(fnames)) {
                   header = FALSE,stringsAsFactors = FALSE)
   varname_tmp = as.character(varname_tmp)
   data2store = c()
+  sfstore = c()
   currentblock = 3
   stopprocess = FALSE
   fnameshort_withoutext = unlist(strsplit(fnames[fi],"[.]cs"))[1]
@@ -77,6 +78,7 @@ for (fi in 1:length(fnames)) {
         # assign names to columns
         colnames(D) = varname_tmp
         # add timestamp
+
         D$timestamp = as.POSIXlt(D[,1]/1000,origin="1970-1-1",tz="Europe/Amsterdam")
         varname = c(varname_tmp,"timestamp")
         # sort column names (variable names)
@@ -117,6 +119,7 @@ for (fi in 1:length(fnames)) {
         # extract sample frequency from timestamps and number of data points
         duration_data_secs = as.numeric(difftime(D$timestamp[nrow(D)],D$timestamp[1],units = "secs"))
         sf = round((nrow(D)-1) / duration_data_secs)
+        sfstore = c(sfstore,sf)
         #-------------------------------
         # calculate enmo features (magnitude of acceleration)
       
@@ -131,14 +134,26 @@ for (fi in 1:length(fnames)) {
         enmo_WR = abs(signal::filter(bf,enmo_WR))
         enmo_LN = abs(signal::filter(bf,enmo_LN))
         
-        
+        # if (epochsize < 1) {
+        #   roundingcorrection = 1/ epochsize
+        # } else {
+        #   roundingcorrection = 1
+        # }
         # downsample
-        FiveSecIndex = round(round(as.numeric(D$timestamp)/epochsize)*epochsize)
+        # if (epochsize < 1) {
+          FiveSecIndex = round(round(as.numeric(D$timestamp)/epochsize*10,digits=1) 
+                             * epochsize*10,digits=1)
+        # } else {
+        #   FiveSecIndex = round((as.numeric(D$timestamp)/epochsize) * epochsize)
+        # }
+        # print(unique(FiveSecIndex)[1:10])
+        
         df_kin = data.frame(enmo_WR=enmo_WR,enmo_LN=enmo_LN,
                             pitch_LN = D$Euler_9DOF_Pitch_LN_CAL, pitch_WR = D$Euler_9DOF_Pitch_WR_CAL,
                             roll_LN = D$Euler_9DOF_Roll_LN_CAL, roll_WR = D$Euler_9DOF_Roll_WR_CAL,
                             yaw_LN = D$Euler_9DOF_Yaw_LN_CAL, yaw_WR = D$Euler_9DOF_Yaw_WR_CAL,
                             time=D$timestamp,numtime=FiveSecIndex)
+        
         if ("GSR_Skin_Conductance_CAL" %in% varname) {
           do.skinsensors = TRUE  
         } else {
@@ -230,11 +245,14 @@ for (fi in 1:length(fnames)) {
         } else {
           data2store = rbind(data2store,agData)
         }
+        # kkk
       }
     }
     graphics.off()
   }
-  write.csv(data2store,file = paste0(outputfolder,"/shim_aggre_",bodyside,"_",fnameshort_withoutext,".csv"),row.names = FALSE)
+  print(sfstore)
+  sfmean = mean(sfstore)
+  write.csv(data2store,file = paste0(outputfolder,"/shim_aggre_",bodyside,"_",fnameshort_withoutext,"_sf",sfmean,".csv"),row.names = FALSE)
   timer1 = Sys.time()
   cat("\nTime elapsed:")
   print(timer1-timer0)
