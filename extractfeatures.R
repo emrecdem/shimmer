@@ -185,14 +185,13 @@ for (fi in 1:length(fnames)) {
         df_kin = df_kin[which(df_kin$numtime >= firstfullepoch),]
         # aggregate
         Omean = aggregate(x = df_kin,by = list(df_kin$numtime),mean)
-        Ostd = aggregate(x = df_kin,by = list(df_kin$numtime),sd)
+        Ostd = aggregate(x = df_kin[,c("enmo_WR","enmo_LN","numtime")],by = list(df_kin$numtime),sd)
         if (do.call ==  FALSE) { # additional aggregations if calibration is not done
-          O50 = aggregate(x = df_kin,by = list(df_kin$numtime),p50)
-          O75 = aggregate(x = df_kin,by = list(df_kin$numtime),p75)
-          O99 = aggregate(x = df_kin,by = list(df_kin$numtime),p99)
-          # Omean = aggregate(x = df_kin,by = list(df_kin$numtime),mean)
-          Omax = aggregate(x = df_kin,by = list(df_kin$numtime),max)
-          # Ostd = aggregate(x = df_kin,by = list(df_kin$numtime),sd)
+          O50 = aggregate(x = df_kin[,c("enmo_WR","enmo_LN","numtime","time")],by = list(df_kin$numtime),p50)
+          O75 = aggregate(x = df_kin[,c("enmo_WR","enmo_LN","numtime")],by = list(df_kin$numtime),p75)
+          O99 = aggregate(x = df_kin[,c("enmo_WR","enmo_LN","numtime")],by = list(df_kin$numtime),p99)
+          Omax = aggregate(x = df_kin[,c("enmo_WR","enmo_LN","numtime")],by = list(df_kin$numtime),max)
+          # update variable names
           O50 = addvarEnmoWR(x = O50, varname="enmoWR_p50")
           O50 = addvarEnmoLN(x = O50, varname="enmoLN_p50")
           O75 = addvarEnmoWR(x = O75, varname="enmoWR_p75")
