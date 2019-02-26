@@ -9,16 +9,13 @@ path = "/media/sf_sharedfolder/Emotion/accelerometer_data"
 datafolder = paste0(path,"/datamichel")
 outputfolder = paste0(path,"/myresults")
 
-# epoch size in seconds to which data will be aggregated:
+# Epoch size in seconds to which data will be aggregated:
 epochsize = 1
-# whether or not to plot some data on screen (mainly useful for testing purposes)
+# Whether or not to plot some data on screen (mainly useful for testing purposes):
 do.plot = TRUE # change to FALSE to turn off / change to TRUE to turn on
-do.call = FALSE
-
 
 # Abbreviations:
-# - WR:  Wide range accelerometer (see Shimmer documentation)
-# - LN:  Low Noise accelerometer (see Shimmer documentation)
+# - WR:  Wide range accelerometer (see Shimmer documentation), we are not using the Low noise accelerometer now.
 # - Yaw, roll and pitch: Euler angles provided by Shimmer software (see Shimmer documention)
 # - enmo: refers to metric used for calculating magnitude of acceleration (abbreviation only
 #         used in code, not in variable names.
@@ -49,20 +46,13 @@ addvarEnmoWR = function(x,varname = "") {
   x = x[,-which(colnames(x) == "enmo_WR")]
   return(x)
 }
-# addvarEnmoLN = function(x,varname = "") {
-#   # replace variable "enmo" with a new name
-#   # this is needed for the output of the aggregate function
-#   x[varname] = x$enmo_LN
-#   x = x[,-which(colnames(x) == "enmo_LN")]
-#   return(x)
-# }
 options(digits.secs=12) # to get more precise fractions of seconds
 #====================================================
 # main code:
 if (dir.exists(outputfolder) == FALSE) dir.create(outputfolder)
 fnames = dir(datafolder)
 bodyside = "bodysideunknown"
-
+do.call = FALSE # Do callibration? (not functional at the moment)
 blocksize = 500000 # If your machine runs out of memory then lower this value.
 for (fi in 1:length(fnames)) {
   timer0 = Sys.time()
@@ -77,7 +67,6 @@ for (fi in 1:length(fnames)) {
   endlastblock = 3
   stopprocess = FALSE
   fnameshort_withoutext = unlist(strsplit(fnames[fi],"[.]cs"))[1]
-  # id = unlist(strsplit(fnameshort_withoutext,"_"))[2]
   blocki = 1
   while (stopprocess == FALSE) {
     # load data
@@ -151,16 +140,12 @@ for (fi in 1:length(fnames)) {
           #-------------------------------
           # calculate enmo features (magnitude of acceleration)
           enmo_WR = get_enmo(x=D$Accel_WR_X_CAL,y=D$Accel_WR_Y_CAL,z=D$Accel_WR_Z_CAL)
-          # enmo_LN = get_enmo(x=D$Accel_LN_X_CAL,y=D$Accel_LN_Y_CAL,z=D$Accel_LN_Z_CAL)
-          
           # remove low frequency component, probably related to imperfect calibration
           lb = 0.2 # lower boundary of the filter
           n = 4 # filter order
           bf = signal::butter(n,c(lb/(sf/2)),type=c("high")) #creating filter coefficients
           # also ignore direction of acceleration now signal is high pass filtered
           enmo_WR = abs(signal::filter(bf,enmo_WR))
-          # enmo_LN = abs(signal::filter(bf,enmo_LN))
-          
           # Calculate separate enmo specifically for peak detecion only for WR for now
           lb = 5 # lower boundary of the filter
           hb = 50 # higher bounder of the filter
@@ -186,17 +171,13 @@ for (fi in 1:length(fnames)) {
         }
         if (do.call ==  FALSE) {
           df_kin = data.frame(enmo_WR=enmo_WR,#enmo_LN=enmo_LN,
-                              # pitch_LN = D$Euler_9DOF_Pitch_LN_CAL,
                               pitch_WR = D$Euler_9DOF_Pitch_WR_CAL,
-                              # roll_LN = D$Euler_9DOF_Roll_LN_CAL,
                               roll_WR = D$Euler_9DOF_Roll_WR_CAL,
-                              # yaw_LN = D$Euler_9DOF_Yaw_LN_CAL,
                               yaw_WR = D$Euler_9DOF_Yaw_WR_CAL,enmopeak = enmopeak,
                               time=D$timestamp,numtime=FiveSecIndex)
         } else { # variables needed for accelerometer calibration assessment
           df_kin = data.frame(Accel_WR_X = D$Accel_WR_X_CAL, Accel_WR_Y = D$Accel_WR_Y_CAL, Accel_WR_Z = D$Accel_WR_Z_CAL,
-                              # Accel_LN_X = D$Accel_LN_X_CAL, Accel_LN_Y = D$Accel_LN_Y_CAL, Accel_LN_Z = D$Accel_LN_Z_CAL,
-                              time=D$timestamp,numtime=FiveSecIndex)
+                               time=D$timestamp,numtime=FiveSecIndex)
         }
         if ("GSR_Skin_Conductance_CAL" %in% varname & do.call ==  FALSE) {
           do.skinsensors = TRUE  
@@ -227,9 +208,7 @@ for (fi in 1:length(fnames)) {
           Omax = aggregate(x = df_kin[,c("enmopeak","numtime")],by = list(df_kin$numtime),max)
           # update variable names
           Omean = addvarEnmoWR(x = Omean, varname="enmoWR_mean")
-          # Omean = addvarEnmoLN(x = Omean, varname="enmoLN_mean")
           Ostd = addvarEnmoWR(x = Ostd, varname="enmoWR_std")
-          # Ostd = addvarEnmoLN(x = Ostd, varname="enmoLN_std")
           # Now put all relevant aggregated variables in a dataframe:
           agData = data.frame(time=O50$time,
                               numtime=O50$numtime,
@@ -239,13 +218,8 @@ for (fi in 1:length(fnames)) {
                               accWR_max=Omax$enmopeak,
                               accWR_mean=Omean$enmoWR_mean,
                               accWR_std=Ostd$enmoWR_std,
-                              # accLN_mean=Omean$enmoLN_mean,
-                              # accLN_std=Ostd$enmoLN_std,
-                              # pitch_LN_mean = Omean$pitch_LN,
                               pitch_WR_mean = Omean$pitch_WR,
-                              # roll_LN_mean = Omean$roll_LN,
                               roll_WR_mean = Omean$roll_WR,
-                              # yaw_LN_mean = Omean$yaw_LN,
                               yaw_WR_mean = Omean$yaw_WR)
           # identify peaks in the magnitude of acceleration (enmo)
           agData$accWR_peak = 0
@@ -256,10 +230,6 @@ for (fi in 1:length(fnames)) {
                                  ((agData$accWR_percentile99-agData$accWR_percentile50)*2) & agData$accWR_max > 2) |
                                 agData$accWR_max > 5)
           agData$accWR_peak[peakindexWR] = 1 
-          # peakindexLN = which(((agData$accLN_max-agData$accLN_percentile50) > 
-          #                        ((agData$accLN_percentile99-agData$accLN_percentile50)*2) & agData$accLN_max > 2) |
-          #                       agData$accLN_max > 10)
-          # agData$accLN_peak[peakindexLN] = 1 
         } else { # when investigating autocalibration the output variables are simpler.
           agData = data.frame(time=Omean$time,
                               numtime=Omean$numtime,
@@ -283,17 +253,11 @@ for (fi in 1:length(fnames)) {
         # plot low resolution data on screen:
         if (do.plot == TRUE & do.call == FALSE) {
           x11()
-          # par(mfrow=c(2,1))
           plot(agData$time,agData$accWR_mean,type="l",ylim=c(0,max(agData$accWR_max)),main="accWR",
                col="blue",xlab="timestamp",ylab="acceleration (m/s2)")
           lines(agData$time,agData$accWR_max,type="l",col="green")
           lines(agData$time[peakindexWR],agData$accWR_max[peakindexWR],col="red",type="p",pch=20,cex=0.5)
           legend("topleft",legend = c("mean","max"),col=c("blue","green"),lty=c(1,1))
-          # plot(agData$time,agData$accLN_mean,type="l",ylim=c(0,max(agData$accLN_max)),main="accLN",
-          #      col="blue",xlab="timestamp",ylab="acceleration (m/s2)")
-          # lines(agData$time,agData$accLN_max,type="l",col="green")
-          # lines(agData$time[peakindexLN],agData$accLN_max[peakindexLN],col="red",type="p",pch=20,cex=0.5)
-          # legend("topleft",legend = c("mean","max"),col=c("blue","green"),lty=c(1,1))
         }
         if (length(data2store) == 0) {
           data2store = agData
