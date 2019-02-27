@@ -38,15 +38,17 @@ datafolder points to the folder where the data (csv files) sit. Also make sure t
   - time
   -	secondsinrecording
   -	numerictime: seconds since 1-1-1970
-  -	acc_percentile50: 50th percentile of magnitude of acceleration based on the three band-pass (5-50 Hertz) filtered acceleration signals.
-  -	acc_percentile75: 75th percentile of magnitude of acceleration based on the three band-pass (5-50 Hertz) filtered acceleration signals.
-  -	acc_percentile99: 99th percentile of magnitude of acceleration based on the three band-pass (5-50 Hertz) filtered acceleration signals.
-  -	acc_max: maximum of magnitude of acceleration based on the three band-pass (5-50 Hertz) filtered acceleration signals.
-  -	acc_mean: mean of magnitude of acceleration based on the acceleration signals filtered with a high-pass (0.2 Hertz) filter.
-  -	acc_std: standard deviation of magnitude of acceleration based on the acceleration signals filtered with a high-pass (0.2 Hertz) filter.
-  -	pitch_mean: Euler angle
-  -	roll_mean: Euler angle
-  -	yaw_mean: Euler angle
+  **variables used for peak detection**
+  -	acc_percentile50: 50th percentile of magnitude of acceleration (m/s2) based on the three band-pass (5-50 Hertz) filtered acceleration signals.
+  -	acc_percentile75: 75th percentile of magnitude of acceleration (m/s2) based on the three band-pass (5-50 Hertz) filtered acceleration signals.
+  -	acc_percentile99: 99th percentile of magnitude of acceleration (m/s2) based on the three band-pass (5-50 Hertz) filtered acceleration signals.
+  -	acc_max: maximum of magnitude of acceleration (m/s2) based on the three band-pass (5-50 Hertz) filtered acceleration signals.
+  **variables for describing kinematics**
+  -	acc_mean: mean of high-pass (0.2 Hertz) filtered magnitude of acceleration (m/s2) after which negative values are rounded to zero.
+  -	acc_std: standard deviation of high-pass (0.2 Hertz) filtered magnitude of acceleration (m/s2) after which negative values are rounded to zero.
+  -	pitch_mean: mean Euler angle pitch.
+  -	roll_mean: mean Euler angle roll.
+  -	yaw_mean: mean Euler angle yaw.
   -	acc_peak: 0 or 1, where 1 indicates a detected peak.
 
 ## Step 3
