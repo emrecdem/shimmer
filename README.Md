@@ -4,9 +4,9 @@ The R code in this repository was written to facilitate the extraction of featur
 
 - Filename has follow structure: Ses9_070518_Session1_C9BB_partB_Calibrated_SD.csv. Where,
   - Ses9 is the session name
-  - 070518 is the date of measurement and acts as person identifier because never two persons are measured on the same data.
+  - partB is the part of the session
+  - 070518 is the date of measurement and together with session name and part acts as person identifier.
   - C9BB is the serial number of the Shimmer device which helps to identify on what location is worn.
-  - Inside the file
 - Inside the file there are column names that include the device serial number (C9BB).
   Except from the C9BB_ prefix the rest of the column names are assumed to be identical. For convenience a csv-file is included in the repository with two rows of example data.
   The key columns we will use are:
