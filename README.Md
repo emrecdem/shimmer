@@ -8,7 +8,7 @@ The R code in this repository was written to facilitate the extraction of featur
   - 070518 is the **date of measurement** and together with session name and part acts as person identifier.
   - C9BB is the **device serial number** of the Shimmer device which helps to identify on what location is worn.
 - Inside the file there are column names that include the device serial number (C9BB).
-  Except from the C9BB_ prefix the rest of the column names are assumed to be identical across measurements. For convenience a [csv-file](example_firstrows_shimmerfie.csv) is included in the repository with two rows of example data.
+  Except from the C9BB_ prefix the rest of the column names are assumed to be identical across measurements. For convenience a [csv-file](example_firstrows_shimmerfile.csv) is included in the repository with two rows of example data.
   The key columns from the file we will use are:
   - CD5D_partA_Timestamp_Unix_CAL
   - CD5D_partA_Euler_9DOF_Yaw_WR_CAL
