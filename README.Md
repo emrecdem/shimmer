@@ -33,4 +33,12 @@ datafolder points to the folder where the data (csv files) sit. Also make sure t
 
 ## Step 2
 
+Source [extractfeatures.R](extractfeatures.R) in R(Studio).
+
+## Step 3
+
 - Open [detecthandclap.R](detecthandclap.R) and modify the top part such that path specifies the same diretory as outputfolder in step 1. The code now assumes that there is a folder "myresults" in this folder, as created by the code in step 1. The handclap times will be stored in csv-files in the outputfolder.
+
+## Step 4
+
+Source [detecthandclap.R](detecthandclap.R)  in R(Studio).
