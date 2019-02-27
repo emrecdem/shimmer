@@ -2,14 +2,14 @@ The R code in this repository was written to facilitate the extraction of featur
 
 ### Assumptions the code makes about the input files
 
-- Filename has follow structure: Ses9_070518_Session1_C9BB_partB_Calibrated_SD.csv. Where,
-  - Ses9 is the session name
-  - partB is the part of the session
-  - 070518 is the date of measurement and together with session name and part acts as person identifier.
-  - C9BB is the serial number of the Shimmer device which helps to identify on what location is worn.
+- Filename has following structure: Ses9_070518_Session1_C9BB_partB_Calibrated_SD.csv. Where,
+  - Ses9 is the **session name**
+  - partB is the **part** of the session
+  - 070518 is the **date of measurement** and together with session name and part acts as person identifier.
+  - C9BB is the **device serial number** of the Shimmer device which helps to identify on what location is worn.
 - Inside the file there are column names that include the device serial number (C9BB).
-  Except from the C9BB_ prefix the rest of the column names are assumed to be identical. For convenience a csv-file is included in the repository with two rows of example data.
-  The key columns we will use are:
+  Except from the C9BB_ prefix the rest of the column names are assumed to be identical across measurements. For convenience a [csv-file](example_firstrows_shimmerfie.csv) is included in the repository with two rows of example data.
+  The key columns from the file we will use are:
   - CD5D_partA_Timestamp_Unix_CAL
   - CD5D_partA_Euler_9DOF_Yaw_WR_CAL
   - CD5D_partA_Euler_9DOF_Yaw_LN_CAL
@@ -23,7 +23,7 @@ The R code in this repository was written to facilitate the extraction of featur
   - CD5D_partA_Accel_LN_Z_CAL
   - CD5D_partA_Accel_LN_Y_CAL
   - CD5D_partA_Accel_LN_X_CAL
-- Shimmer is worn on non dominant wrist, dominant wrist and chest.
+- The code currently assumes that shimmer devices are worn on the non dominant wrist, dominant wrist and/or chest.
 
 ## Step 1
 
