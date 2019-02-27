@@ -33,7 +33,21 @@ datafolder points to the folder where the data (csv files) sit. Also make sure t
 
 ## Step 2
 
-Source [extractfeatures.R](extractfeatures.R) in R(Studio).
+- Source [extractfeatures.R](extractfeatures.R) in R(Studio).
+- We expect output (csv) files with columns:
+  - time
+  -	secondsinrecording
+  -	numerictime: seconds since 1-1-1970
+  -	acc_percentile50: 50th percentile of magnitude of acceleration based on the three band-pass (5-50 Hertz) filtered acceleration signals.
+  -	acc_percentile75: 75th percentile of magnitude of acceleration based on the three band-pass (5-50 Hertz) filtered acceleration signals.
+  -	acc_percentile99: 99th percentile of magnitude of acceleration based on the three band-pass (5-50 Hertz) filtered acceleration signals.
+  -	acc_max: maximum of magnitude of acceleration based on the three band-pass (5-50 Hertz) filtered acceleration signals.
+  -	acc_mean: mean of magnitude of acceleration based on the acceleration signals filtered with a high-pass (0.2 Hertz) filter.
+  -	acc_std: standard deviation of magnitude of acceleration based on the acceleration signals filtered with a high-pass (0.2 Hertz) filter.
+  -	pitch_mean: Euler angle
+  -	roll_mean: Euler angle
+  -	yaw_mean: Euler angle
+  -	acc_peak: 0 or 1, where 1 indicates a detected peak.
 
 ## Step 3
 
@@ -41,4 +55,5 @@ Source [extractfeatures.R](extractfeatures.R) in R(Studio).
 
 ## Step 4
 
-Source [detecthandclap.R](detecthandclap.R)  in R(Studio).
+- Source [detecthandclap.R](detecthandclap.R)  in R(Studio).
+- We expect an output (csv) files with one column: timestamp.
