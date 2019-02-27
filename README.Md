@@ -26,9 +26,9 @@ The R code in this repository was written to facilitate the extraction of featur
 - Shimmer is worn on non dominant wrist, dominant wrist and chest.
 
 ## Step 1
-Open extractfeatures.R and modify the top part such that
+Open [extractfeatures.R](extractfeatures.R) and modify the top part such that
 datafolder points to the folder where the data (csv files) sit.
 and that outputfolder point to the folder where you want the output to be stored. The code will create a folder in this folder named "myresults".
 
 ## Step 2
-Open detecthandclap.R and modify the top part such that path specifies the same diretory as outputfolder in step 1. The code now assumes that there is a folder "myresults" in this folder, as created by the code in step 1.
+Open [detecthandclap.R](detecthandclap.R) and modify the top part such that path specifies the same diretory as outputfolder in step 1. The code now assumes that there is a folder "myresults" in this folder, as created by the code in step 1.
