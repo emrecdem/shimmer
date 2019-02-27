@@ -31,4 +31,4 @@ datafolder points to the folder where the data (csv files) sit.
 and that outputfolder point to the folder where you want the output to be stored. The code will create a folder in this folder named "myresults".
 
 ## Step 2
-Open [detecthandclap.R](detecthandclap.R) and modify the top part such that path specifies the same diretory as outputfolder in step 1. The code now assumes that there is a folder "myresults" in this folder, as created by the code in step 1.
+Open [detecthandclap.R](detecthandclap.R) and modify the top part such that path specifies the same diretory as outputfolder in step 1. The code now assumes that there is a folder "myresults" in this folder, as created by the code in step 1. The handclap times will be stored in csv-files in the outputfolder.
