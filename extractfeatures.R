@@ -56,7 +56,8 @@ options(digits.secs=12) # to get more precise fractions of seconds
 if (dir.exists(outputfolder) == FALSE) dir.create(outputfolder)
 fnames = dir(datafolder)
 bodyside = "bodysideunknown"
-do.call = FALSE # Do callibration? (not functional at the moment)
+do.call = TRUE # Do callibration? (not functional at the moment)
+if (do.call == TRUE) epochsize = 30
 blocksize = 500000 # If your machine runs out of memory then lower this value.
 for (fi in 1:length(fnames)) {
   timer0 = Sys.time()
@@ -223,7 +224,12 @@ for (fi in 1:length(fnames)) {
         df_kin = df_kin[which(df_kin$numerictime >= firstfullepoch),]
         # aggregate
         Omean = aggregate(x = df_kin,by = list(df_kin$numerictime),mean)
-        Ostd = aggregate(x = df_kin[,c("enmo","numerictime")],by = list(df_kin$numerictime),sd)
+        if (do.call == FALSE) {
+          Ostd = aggregate(x = df_kin[,c("enmo","numerictime")],by = list(df_kin$numerictime),sd)
+        } else {
+          Ostd = aggregate(x = df_kin[,c("Accel_X","Accel_Y","Accel_Z","numerictime")],by = list(df_kin$numerictime),sd)
+        }
+    
         if (do.call ==  FALSE) { # additional aggregations if calibration is not done
           O50 = aggregate(x = df_kin[,c("enmopeak","numerictime","time")], by = list(df_kin$numerictime),p50)
           O75 = aggregate(x = df_kin[,c("enmopeak","numerictime")], by = list(df_kin$numerictime),p75)
@@ -257,20 +263,15 @@ for (fi in 1:length(fnames)) {
         } else { # when investigating autocalibration the output variables are simpler.
           agData = data.frame(time=Omean$time,
                               numerictime=Omean$numerictime,
-                              Accel_LN_X_mean = Omean$Accel_LN_X,
-                              Accel_LN_Y_mean = Omean$Accel_LN_Y,
-                              Accel_LN_Z_mean = Omean$Accel_LN_Z,
-                              Accel_LN_X_std = Ostd$Accel_LN_X,
-                              Accel_LN_Y_std = Ostd$Accel_LN_Y,                              
-                              Accel_LN_Z_std = Ostd$Accel_LN_Z,
-                              Accel_WR_X_mean = Omean$Accel_WR_X,
-                              Accel_WR_Y_mean = Omean$Accel_WR_Y,
-                              Accel_WR_Z_mean = Omean$Accel_WR_Z,
-                              Accel_WR_X_std = Ostd$Accel_WR_X,
-                              Accel_WR_Y_std = Ostd$Accel_WR_Y,
-                              Accel_WR_Z_std = Ostd$Accel_WR_Z)
+                              Accel_X_mean = Omean$Accel_X,
+                              Accel_Y_mean = Omean$Accel_Y,
+                              Accel_Z_mean = Omean$Accel_Z,
+                              Accel_X_std = Ostd$Accel_X,
+                              Accel_Y_std = Ostd$Accel_Y,                              
+                              Accel_Z_std = Ostd$Accel_Z,
+                              EN = sqrt(Omean$Accel_X^2 + Omean$Accel_Y^2 + Omean$Accel_Z^2))
         }
-        if (do.skinsensors == TRUE) {
+        if (do.skinsensors == TRUE & do.call == FALSE) {
           agData$GSR_Skin_Conductance_mean = Oskin$GSR_Skin_Conductance 
           agData$GSR_Skin_Resistance_mean = Oskin$GSR_Skin_Resistance
         }
@@ -292,14 +293,29 @@ for (fi in 1:length(fnames)) {
     }
     graphics.off()
   }
-  sfmean = mean(sfstore)
+  if (length(sfstore) > 0) {
+    sfmean = round(mean(sfstore))
+  } else {
+    sfmean = NA
+  }
   if (do.call == FALSE) {
     write.csv(data2store,file = paste0(outputfolder,"/shimmer_",
-                                       bodyside,"_",fnameshort_withoutext,"_sf",sfmean,
+                                       bodyside,"_",fnameshort_withoutext,"_sf",sfmean,"_sernum",sn,
                                        "_acc",AccelerometerType,".csv"),row.names = FALSE)
   } else {
-    write.csv(data2store,file = paste0(outputfolder,"/shim_calibrationcheck_",
-                                       fnameshort_withoutext,".csv"),row.names = FALSE)
+    spheredata = which(data2store$Accel_X_std < 0.128 & # note threshold in m/s2
+                         data2store$Accel_X_std < 0.128 &
+                         data2store$Accel_X_std < 0.128)
+    cat(paste0("\nLength spheredata: ",length(spheredata)))
+    if (length(spheredata) > 1) {
+      data2store = data2store[spheredata,]
+      write.csv(data2store,file = paste0(outputfolder,"/shim_calibrationcheck_",
+                                         fnameshort_withoutext,"_sernum",sn,".csv"),row.names = FALSE)
+      
+      CalibrationError_ms2 = mean(abs(data2store$EN - 9.81))
+      CalibrationError_mg = CalibrationError_ms2 / 9.81
+      cat(paste0("\nCalibration error in g: ",CalibrationError_mg))
+    }
   }
   timer1 = Sys.time()
   cat("\nTime elapsed:")
