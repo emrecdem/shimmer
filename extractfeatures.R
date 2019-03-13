@@ -15,7 +15,7 @@ DeviceSerialNumbers_nondominantwrist = c("D910", "D821")
 DeviceSerialNumbers_chest = c("D977", "DA9F")
 epochsize = 1 # Epoch size in seconds to which data will be aggregated:
 do.plot = TRUE # Create plot on screen (for testing). change to FALSE to turn off / change to TRUE to turn on
-
+do.call = FALSE # Do callibration assessment? (if true then this prevents normal extraction of features at the moment)
 #----------------------------------------------------------------------
 # Abbreviations:
 # - WR:  Wide range accelerometer (see Shimmer documentation)
@@ -56,7 +56,7 @@ options(digits.secs=12) # to get more precise fractions of seconds
 if (dir.exists(outputfolder) == FALSE) dir.create(outputfolder)
 fnames = dir(datafolder)
 bodyside = "bodysideunknown"
-do.call = TRUE # Do callibration? (not functional at the moment)
+
 if (do.call == TRUE) epochsize = 30
 blocksize = 500000 # If your machine runs out of memory then lower this value.
 for (fi in 1:length(fnames)) {
