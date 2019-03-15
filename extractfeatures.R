@@ -6,8 +6,8 @@ graphics.off() # WARNING: this will close all open figures, comment this out if 
 #=============================================================
 # specify location of data folder and output folder:
 path = "/media/sf_sharedfolder/Emotion/accelerometer_data"
-datafolder = paste0(path,"/datamichel2")
-outputfolder = paste0(path,"/myresults2")
+datafolder = paste0(path,"/datamichel")
+outputfolder = paste0(path,"/myresults")
 
 AccelerometerType = "WR" # Choose which of the two accelerometers to use, alternatively use "LN"
 DeviceSerialNumbers_dominantwrist = c("CD5D", "C9BB")

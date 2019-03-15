@@ -7,11 +7,14 @@ graphics.off()
 path = "/media/sf_sharedfolder/Emotion/accelerometer_data"
 # assumption is that there is a 'myresults' folder in this folder
 # in which the extracted features are stored.
-do.plot = TRUE # Create plot on screen (for testing). change to FALSE to turn off / change to TRUE to turn on
-#==============================================
 
 outputfolder = paste0(path,"/myresults")
 handclapfolder = paste0(path,"/handclaps") # create folder in which the handclaptimes are stored
+
+do.plot = TRUE # Create plot on screen (for testing). change to FALSE to turn off / change to TRUE to turn on
+#==============================================
+
+
 if (dir.exists(handclapfolder) == FALSE) dir.create(handclapfolder)
 # extract relevant information from filenames in the 'myresults' folder
 fnamesfull = dir(outputfolder,full.names = TRUE)
