@@ -6,8 +6,8 @@ graphics.off() # WARNING: this will close all open figures, comment this out if 
 #=============================================================
 # specify location of data folder and output folder:
 path = "/media/sf_sharedfolder/Emotion/accelerometer_data"
-datafolder = paste0(path,"/datamichel")
-outputfolder = paste0(path,"/myresults")
+datafolder = paste0(path,"/datamichel2")
+outputfolder = paste0(path,"/myresults2")
 
 AccelerometerType = "WR" # Choose which of the two accelerometers to use, alternatively use "LN"
 DeviceSerialNumbers_dominantwrist = c("CD5D", "C9BB")
@@ -16,6 +16,7 @@ DeviceSerialNumbers_chest = c("D977", "DA9F")
 epochsize = 1 # Epoch size in seconds to which data will be aggregated:
 do.plot = TRUE # Create plot on screen (for testing). change to FALSE to turn off / change to TRUE to turn on
 do.call = FALSE # Do callibration assessment? (if true then this prevents normal extraction of features at the moment)
+desired_sample_rate = 500
 #----------------------------------------------------------------------
 # Abbreviations:
 # - WR:  Wide range accelerometer (see Shimmer documentation)
@@ -50,6 +51,7 @@ addvarEnmo = function(x,varname = "") {
   x = x[,-which(colnames(x) == "enmo")]
   return(x)
 }
+
 options(digits.secs=12) # to get more precise fractions of seconds
 #====================================================
 # main code:
@@ -129,8 +131,38 @@ for (fi in 1:length(fnames)) {
         colnames(D) = varname
         # extract sample frequency from timestamps and number of data points
         duration_data_secs = as.numeric(difftime(D$timestamp[nrow(D)],D$timestamp[1],units = "secs"))
-        sf = round((nrow(D)-1) / duration_data_secs)
-        sfstore = c(sfstore,sf)
+        
+        #----------------------------------------------------------------
+        # resample all data, because sample frequency in Shimmer seems variable
+        # we need consistent sample rate to be able reliably be able to apply filter
+        # and to get more meaningful aggregates
+        columns2resample = colnames(D)[which(colnames(D) != "timestamp")]
+        time_old = D$timestamp # current time series
+        t0 = D$timestamp[1]
+        t1 = D$timestamp[nrow(D)]
+        time_new = seq(from=t0,to=t1,by=1/desired_sample_rate)  # new time series, based on desired sample rate
+        cnt = 1
+        for (colname in columns2resample) {
+          y = D[,colname]
+          finterpol <- approxfun(time_old,D$Accel_LN_X_CAL)
+          y2 = finterpol(time_new)
+          if (cnt == 1) {
+            D2 = as.data.frame(matrix(NA,length(y2),ncol(D)))
+            colnames(D2) = colnames(D)
+            D2$timestamp = time_new
+            cnt = cnt + 1
+          }
+          D2[,colname] = y2
+        }
+        D = D2 # D is now the resampled data at 500 Hertz
+        ## code to calculate sample rate per sample
+        # sf_per_sample = 1 / diff(as.numeric(D$timestamp)) 
+        # D$sf_per_sample = sf_per_sample[length(sf_per_sample)]
+        # D$sf_per_sample[1:length(sf_per_sample)] = sf_per_sample
+        sf = (nrow(D)-1) / duration_data_secs
+        # cat(paste0(" ",round(sf,digits=2))) # print sample frequency in console
+        sfstore = c(sfstore,round(sf)) # store sample rate, just as an extra check
+        #----------------------------------------------------
         # Now we know the sample rate, we can assess how many rows there are too many in this data block for
         # integer number of feature extraction.
         # First, append rows from previous iteration. For the first iteration this will append an empty object
