@@ -136,15 +136,15 @@ for (fi in 1:length(fnames)) {
         # resample all data, because sample frequency in Shimmer seems variable
         # we need consistent sample rate to be able reliably be able to apply filter
         # and to get more meaningful aggregates
-        columns2resample = colnames(D)[which(colnames(D) != "timestamp")]
-        time_old = D$timestamp # current time series
-        t0 = D$timestamp[1]
-        t1 = D$timestamp[nrow(D)]
+        columns2resample = colnames(D)[which(colnames(D) != "timestamp" & is.na(colnames(D)) == FALSE & colnames(D) != "NA")]
+        time_old = as.numeric(D$timestamp) # current time series, changed to numeric to speed up the resampling
+        t0 = as.numeric(D$timestamp[1])
+        t1 = as.numeric(D$timestamp[nrow(D)])
         time_new = seq(from=t0,to=t1,by=1/desired_sample_rate)  # new time series, based on desired sample rate
         cnt = 1
         for (colname in columns2resample) {
           y = D[,colname]
-          finterpol <- approxfun(time_old,D$Accel_LN_X_CAL)
+          finterpol <- approxfun(time_old,D[,colname], ties = "ordered")
           y2 = finterpol(time_new)
           if (cnt == 1) {
             D2 = as.data.frame(matrix(NA,length(y2),ncol(D)))
@@ -154,6 +154,8 @@ for (fi in 1:length(fnames)) {
           }
           D2[,colname] = y2
         }
+        D2$timestamp = as.POSIXlt(D2$timestamp, origin="1970-1-1",tz="Europe/Amsterdam") # revert back to POSIX
+
         D = D2 # D is now the resampled data at 500 Hertz
         ## code to calculate sample rate per sample
         # sf_per_sample = 1 / diff(as.numeric(D$timestamp)) 
