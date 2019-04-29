@@ -15,7 +15,22 @@ DeviceSerialNumbers_nondominantwrist = c("D910", "D821")
 DeviceSerialNumbers_chest = c("D977", "DA9F")
 epochsize = 1 # Epoch size in seconds to which data will be aggregated:
 do.plot = TRUE # Create plot on screen (for testing). change to FALSE to turn off / change to TRUE to turn on
-do.call = FALSE # Do callibration assessment? (if true then this prevents normal extraction of features at the moment)
+do.call = TRUE # Do callibration assessment?
+
+# Note on calibration assessment (do.call):
+# * If set to FALSE this script generates one output file per recording with features
+# for the entire time series at the specified epoch size.
+# * If set to TRUE this script generates one output file per recording with the mean
+# and standard deviation of the acceleration signals over 30 second intervals for periods with no
+# or very little movement.
+# The last column of the file is EN (Euclidean Norm) of the mean per axis. If the sensors are well
+# calibrated this value should be close to the magnitude of gravitational acceleration.
+# For example, an average of 10 m/s2 and a local gravitational acceleration of 9.81 would mean an error 
+# 0.19 m/s2 (1.9%). I developed a technique to correct for poor calibration
+# (https://doi.org/10.1152/japplphysiol.00421.2014) in multi-day acceleration recordings.
+# However, this will probably not work in the short experiments we do.
+# If the calibration error is < 3% I would not worry about this aspect too much, but only keep it in mind
+# when interpretting the results.
 desired_sample_rate = 500
 #----------------------------------------------------------------------
 # Abbreviations:
