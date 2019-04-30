@@ -13,7 +13,7 @@ AccelerometerType = "WR" # Choose which of the two accelerometers to use, altern
 DeviceSerialNumbers_dominantwrist = c("CD5D", "C9BB")
 DeviceSerialNumbers_nondominantwrist = c("D910", "D821")
 DeviceSerialNumbers_chest = c("D977", "DA9F")
-epochsize = 0.1 # Epoch size in seconds to which data will be aggregated:
+epochsize = 1 # Epoch size in seconds to which data will be aggregated:
 
 # Note on epochsize: If the epochsize is less than 0.1 handclap detection is not facilitated.
 # The only features that will be extracted are magnitude of acceleration and the three angles (pitch, roll, yaw).
